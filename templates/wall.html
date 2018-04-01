@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Success</title>
+</head>
+<body>
+    <h1>Welcome {{ session['fname'] }}, you have logged in successfully!</h1>
+    <p>Your user id: {{ session['id'] }}</p>
+
+    <form action="/message" method='POST'>
+        <!-- <p>Post a message</p> -->
+        <textarea name="message" id="message" cols="100" rows="6">Post a message</textarea>
+        <input type="submit" value="Post Message">
+    </form>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p>{{message}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <h2>Wall Messages:</h2>
+    {% if post_data %}
+      {% for post in post_data %}
+      <fieldset>
+            <h3>{{ post['Name'] }} -- {{ post['Post_Date'] }}</h3>
+            <p>{{ post['message'] }}</p>
+            <!-- DELETE FUNCTIONALITY -->
+            {% if post['user_id'] == session['id'] %}
+            <a href="/message/delete/{{post['id']}}">Delete</a>
+            {% endif %}
+            <h4>Comments:</h4>
+            {% if comment_data %}
+                {% for comment in comment_data %}
+                    <ul>
+                        {% if comment['message_id'] == post['id'] %}
+                        <li>{{comment['comment']}}--{{ comment['Name'] }} -- {{ comment['Comment_Date'] }}</li>
+                        {% endif %}    
+                    </ul>
+                {% endfor %}
+            {% endif %}
+            <form action="/comment" method='POST'>
+                <p>Post a comment</p>
+                <input type="hidden" value={{post['id']}} name="message_ID">
+                <textarea name="comment" id="comment" cols="100" rows="2"></textarea>
+                <input type="submit" value="Post Comment">
+            </form>
+        </fieldset>
+        {% endfor %}
+    {% endif %}
+
+    <form action="/logout">
+    <input type="submit" value="Logout">
+    </form>
+</body>
+</html>
